@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'DM/styles.css' %}" />
+    <title>{{ current_user }}</title>
+</head>
+<body>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+
+        let current_user = "{{ current_user|escapejs }}";
+        let gold = Number("{{ inv.gold|escapejs }}");
+        let hp = Number("{{ inv.hp|escapejs }}");
+
+        var usernameElement = document.getElementById('username');
+        var goldElement = document.getElementById('gold');
+        var hpElement = document.getElementById('hp');
+        var eventElement = document.getElementById('event');
+        var button = document.getElementById("go");
+        var button_save = document.getElementById("save");
+
+        usernameElement.innerHTML = `Username: ${ current_user }`;
+        goldElement.innerHTML = `Gold: ${ gold }`;
+        hpElement.innerHTML = `HP: ${ hp }`;
+
+        function history(string){
+            var el = document.createElement('p');
+            el.innerHTML = string;
+            document.getElementById('his').appendChild(el);
+        }
+        function battle(string, dmg){
+            var dmg = Math.floor(Math.random() * (dmg - 0 + 1)) + 0;
+            hp -= dmg;
+            eventElement.innerHTML = string;
+            hpElement.innerHTML = `HP: ${ hp }`;
+            history(`${ string } (-${ dmg } HP)`);
+        }
+        function test(){
+
+            let random_seed = Math.floor(Math.random() * (3 - 0 + 1)) + 0;
+
+            if (random_seed == 0){
+                var new_gold = Math.floor(Math.random() * (10 - 0 + 1)) + 0;
+                gold += new_gold;
+                eventElement.innerHTML = "You found a gold";
+                goldElement.innerHTML = `Gold: ${ gold }`;
+                history(`You found a ${ new_gold } gold`);
+            }
+            if (random_seed == 1){
+                battle("You are fighting a wolf", 10);
+            }
+            if (random_seed == 2){
+                battle("You are fighting a giant frog", 5);
+            }
+            if (random_seed == 3){
+                battle("You are fighting a thief", 25);
+            }
+            if (hp <= 0){
+                hp = 0;
+                hpElement.innerHTML = `HP: ${ hp }`;
+                button.remove();
+                eventElement.innerHTML = "You are dead";
+            }
+        }
+        function save(){
+            document.getElementById("gold_form").value = gold;
+            document.getElementById("hp_form").value = hp;
+        }
+        button.onclick = test;
+        button_save.onclick = save;
+    </script>
+    <div class="main">
+        <div class="info">
+            <a href="/dma/">Main Page</a>
+            <h2 id="username">Username:</h2>
+            <h2 id="gold">Gold:</h2>
+            <h2 id="hp">HP:</h2>
+        </div>
+        <div class="main-window">
+            <h1 id="event" class="main-border">The adventure begins...</h1>
+            <div class="main">
+                <button id="go" class="button">GO</button>
+                <div class="form-left">
+                    <form action="/dma/main/" method="post">
+                        {% csrf_token %}
+                        <input id="gold_form" type="hidden" name="gold" value="">
+                        <input id="hp_form" type="hidden" name="hp" value="">
+                        <input id="save" class="button" type="submit" value="Save">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="history without-scrollbar">
+            <h2>History</h2>
+            <div id="his"></div>
+        </div>
+    </div>
+</body>
+</html>

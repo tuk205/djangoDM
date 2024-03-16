@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'DM/login.css' %}" />
+    <title>Register</title>
+</head>
+<body>
+    <div class="form">
+        <form action="/dma/register/" method="post">
+            {% csrf_token %}
+            <input name="name" type="text">
+            <input name="password" type="text">
+            <input type="submit" value="OK">
+        </form>
+    </div>
+</body>
+</html>
